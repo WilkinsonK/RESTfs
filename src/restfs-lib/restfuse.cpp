@@ -19,6 +19,7 @@ int restfs::doRESTfulRead(
 
     auto conn = restfs_pool->aquire();
     auto resp = conn->get(path);
+    restfs_pool->release(conn);
 
     if (resp.code == 404)
         return -ENOENT;
@@ -38,15 +39,4 @@ int restfs::doRESTfulReaddir(
 {
     // TODO: implement this callback.
     return -1;
-}
-
-// TODO: This is primitive and needs to be better
-// defined.
-restfs::RESTfulFileType restfs::file_type(const std::string& path)
-{
-    if (strcmp(path.c_str(), "/") == 0)
-        return FT_ROOT;
-    if (strcmp(path.c_str(), "/" restfs_NAME) == 0)
-        return FT_FILE;
-    return FT_NONE;
 }
