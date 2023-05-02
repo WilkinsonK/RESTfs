@@ -1,1 +1,3 @@
-cd dist && make -j; popd
+#!/bin/bash
+
+pushd dist &> /dev/null && make -j; popd &> /dev/null
