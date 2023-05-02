@@ -12,7 +12,7 @@
 #include <restclient-cpp/connection.h>
 #include <restclient-cpp/restclient.h>
 
-#define restfs_NAME "xnat"
+#define RESTFS_NAME "restfs"
 
 namespace restfs
 {

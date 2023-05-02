@@ -6,7 +6,7 @@ restfs::RESTfulFileType restfs::file_type(const std::string& path)
 {
     if (strcmp(path.c_str(), "/") == 0)
         return FT_ROOT;
-    if (strcmp(path.c_str(), "/" restfs_NAME) == 0)
+    if (strcmp(path.c_str(), "/" RESTFS_NAME) == 0)
         return FT_FILE;
     return FT_NONE;
 }
