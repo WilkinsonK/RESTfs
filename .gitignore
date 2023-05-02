@@ -1,0 +1,8 @@
+# Ignore "hidden" directories
+.tmp/
+.vscode/
+.idle/
+
+# Ignore build directories and assets
+dist/
+include/
