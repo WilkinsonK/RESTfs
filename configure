@@ -1,4 +1,4 @@
 #!/bin/bash
 
 cmake -DCMAKE_BUILD_TYPE=Debug -Bdist .
-echo 'cd dist && make -j; popd' > build.sh && chmod u+x ./build.sh
+echo 'pushd dist &> /dev/null && make -j; popd &> /dev/null' > build.sh && chmod u+x ./build.sh

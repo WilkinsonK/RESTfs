@@ -6,3 +6,4 @@
 # Ignore build directories and assets
 dist/
 include/
+build.sh
