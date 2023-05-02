@@ -35,6 +35,7 @@ namespace restfs
     };
 
     std::string protocol2string(RESTfulProtocol protocol);
+    RESTfulFileType file_type(const std::string& path);
 
     /**
      * Pool of `RESTfulConnection` objects.
@@ -113,7 +114,6 @@ namespace restfs
             fuse_fill_dir_t filler,
             off_t offset,
             struct fuse_file_info* fi);
-    RESTfulFileType file_type(const std::string& path);
 
     static int restGetattr(const char* path, struct stat* stbuffer)
     {
