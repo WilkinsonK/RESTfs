@@ -18,8 +18,9 @@ set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake" ${CMAKE_MODULE_PATH})
 # We are putting these 'find' calls here to make
 # it easier to identify what dependencies are
 # active in this project.
-find_package(restclient-cpp CONFIG REQUIRED)
+find_package(cereal CONFIG REQUIRED)
 find_package(FUSE REQUIRED)
+find_package(restclient-cpp CONFIG REQUIRED)
 
 include_directories(${FUSE_INCLUDE_DIR})
 

@@ -6,13 +6,25 @@
 #include <mutex>
 #include <sstream>
 #include <vector>
+#include <dirent.h>
 #include <string.h>
 
+#include <cereal/cereal.hpp>
+#include <cereal/types/vector.hpp>
+#include <cereal/archives/json.hpp>
 #include <fuse.h>
 #include <restclient-cpp/connection.h>
 #include <restclient-cpp/restclient.h>
 
 #define RESTFS_NAME "restfs"
+
+// Maxing max content lenght at 2GB. This may
+// result in parsing issues where we need to
+// separate incoming data in chunks.
+// It is suspected some files will be much
+// larger than this limit.
+#define RESTFS_MAX_CONTENT_LENGTH (size_t)(1000 * 1000 * 1000 * 2);
+#define RESTFS_MAX_PATH_LENGTH (size_t)256
 
 namespace restfs
 {
@@ -24,6 +36,7 @@ namespace restfs
         FT_NONE,
         FT_ROOT,
         FT_FILE,
+        FT_FDIR
     };
 
     // Type aliases for frequently used
@@ -34,8 +47,7 @@ namespace restfs
         P_FILE,
     };
 
-    std::string protocol2string(RESTfulProtocol protocol);
-    RESTfulFileType file_type(const std::string& path);
+    std::string protocol2string(RESTfulProtocol);
 
     /**
      * Pool of `RESTfulConnection` objects.
@@ -44,19 +56,19 @@ namespace restfs
     {
         public:
             sharedConnection aquire();
-            void release(sharedConnection conn);
+            void release(sharedConnection);
 
             size_t activeCount();
             size_t unusedCount();
             size_t lastUnused();
 
             RESTfulPool(
-                const std::string& hostname,
-                const std::string& username,
-                const std::string& password,
-                RESTfulProtocol protocol = P_HTTPS,
-                size_t port = 0,
-                size_t pool_size = 256);
+                const std::string&,
+                const std::string&,
+                const std::string&,
+                RESTfulProtocol = P_HTTPS,
+                size_t = 0,
+                size_t = 256);
 
             virtual ~RESTfulPool();
 
@@ -68,14 +80,14 @@ namespace restfs
              * configuration defined by this object pool.
             */
             void createConnection(
-                const std::string& username,
-                const std::string& password);
+                const std::string&,
+                const std::string&);
 
             /**
              * Removes a connection from the object pool. Performs
              * teardown on `RestClient::Connection` objects.
             */
-            void removeConnection(sharedConnection conn);
+            void removeConnection(sharedConnection);
 
         private:
             /* 
@@ -101,19 +113,19 @@ namespace restfs
             sharedConnection unused_stack[request_conf.POOL_SIZE];
     };
 
-    int doRESTfulGetattr(const char* path, struct stat* stbuffer);
+    int doRESTfulGetattr(const char*, struct stat*);
     int doRESTfulRead(
-        const char* path,
-        char* buffer,
-        size_t size,
-        off_t offset,
-        struct fuse_file_info* fi);
+        const char*,
+        char*,
+        size_t,
+        off_t,
+        struct fuse_file_info*);
     int doRESTfulReaddir(
-            const char* path,
-            void* buffer,
-            fuse_fill_dir_t filler,
-            off_t offset,
-            struct fuse_file_info* fi);
+            const char*,
+            void*,
+            fuse_fill_dir_t,
+            off_t,
+            struct fuse_file_info*);
 
     static int restGetattr(const char* path, struct stat* stbuffer)
     {
@@ -147,4 +159,38 @@ namespace restfs
         .read    = restRead,
         .readdir = restReaddir,
     };
+
+    struct RESTfulFSObject
+    {
+        RESTfulFileType info_ft;
+        std::string     info_path;
+        uint            info_atime;
+        uint            info_mtime;
+        uint            info_ctime;
+        int             info_ino;
+        int             info_dtype;
+        std::string     info_dname;
+
+        size_t      content_length;
+        std::string content;
+        std::vector<RESTfulFSObject> nodes;
+
+        template<class Archive>
+        void serialize(Archive& archive)
+        {
+            archive(
+                info_ft,
+                info_path,
+                info_atime,
+                info_mtime,
+                info_ctime,
+                info_ino,
+                info_dtype,
+                info_dname,
+                content_length,
+                content,
+                nodes);
+        }
+    };
+
 } // namespace restfs
