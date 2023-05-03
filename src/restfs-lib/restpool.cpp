@@ -69,7 +69,10 @@ restfs::RESTfulPool::RESTfulPool(
     size_t port,
     size_t pool_size)
 {
-    RestClient::init();
+    if (!this->active_pool_count++)
+    {
+        RestClient::init();
+    }
 
     this->hostname = hostname;
     this->port = port;
@@ -85,5 +88,8 @@ restfs::RESTfulPool::RESTfulPool(
 
 restfs::RESTfulPool::~RESTfulPool()
 {
-    RestClient::disable();
+    if (!this->active_pool_count--)
+    {
+        RestClient::disable();
+    }
 }

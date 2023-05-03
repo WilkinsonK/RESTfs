@@ -73,6 +73,11 @@ namespace restfs
             virtual ~RESTfulPool();
 
         protected:
+            /**
+             * Returns the base URL used for making RESTful calls.
+             * This includes protocol, host name, and port number if
+             * provided.
+            */
             std::string getFullURL();
 
             /**
@@ -102,6 +107,13 @@ namespace restfs
                 inline static const char   USER_AGENT[14] = "restfs-v0.0.0";
                 inline static const size_t POOL_SIZE = 256;
             } request_conf;
+
+            /**
+             * Number of active pools. Used as a reference count to
+             * determine control of `RestClient` startup and
+             * shutdown.
+            */
+            inline static uint active_pool_count = 0;
 
             std::mutex aquisition_mut;
             std::condition_variable aquisition_cv;
@@ -173,6 +185,7 @@ namespace restfs
 
         size_t      content_length;
         std::string content;
+
         std::vector<RESTfulFSObject> nodes;
 
         template<class Archive>
