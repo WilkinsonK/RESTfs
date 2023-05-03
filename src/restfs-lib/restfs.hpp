@@ -6,7 +6,6 @@
 #include <mutex>
 #include <sstream>
 #include <vector>
-#include <dirent.h>
 #include <string.h>
 
 #include <cereal/cereal.hpp>
@@ -174,14 +173,15 @@ namespace restfs
 
     struct RESTfulFSObject
     {
-        RESTfulFileType info_ft;
-        std::string     info_path;
-        uint            info_atime;
-        uint            info_mtime;
-        uint            info_ctime;
-        int             info_ino;
-        int             info_dtype;
-        std::string     info_dname;
+        RESTfulFileType   info_ft;
+        std::string       info_path;
+        uint              info_s_atime; // (a,m & c) time in seconds
+        uint              info_s_mtime;
+        uint              info_s_ctime;
+        unsigned long int info_ino;
+        uint              info_uid;
+        int               info_dtype;
+        std::string       info_dname;
 
         size_t      content_length;
         std::string content;
@@ -194,10 +194,11 @@ namespace restfs
             archive(
                 info_ft,
                 info_path,
-                info_atime,
-                info_mtime,
-                info_ctime,
+                info_s_atime,
+                info_s_mtime,
+                info_s_ctime,
                 info_ino,
+                info_uid,
                 info_dtype,
                 info_dname,
                 content_length,

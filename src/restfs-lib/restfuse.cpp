@@ -17,10 +17,11 @@ int restfs::doRESTfulGetattr(const char* path, struct stat* stbuffer)
     RESTfulFSObject fso;
     ar(fso);
 
-    stbuffer->st_ino  = fso.info_ino;
-    stbuffer->st_atim = (timespec)fso.info_atime;
-    stbuffer->st_mtim = (timespec)fso.info_mtime;
-    stbuffer->st_ctim = (timespec)fso.info_ctime;
+    stbuffer->st_ino = fso.info_ino;
+    stbuffer->st_uid = fso.info_uid;
+    stbuffer->st_atim.tv_sec = fso.info_s_atime;
+    stbuffer->st_mtim.tv_sec = fso.info_s_mtime;
+    stbuffer->st_ctim.tv_sec = fso.info_s_ctime;
 
     return 0;
 }
@@ -69,8 +70,6 @@ int restfs::doRESTfulReaddir(
     off_t offset,
     struct fuse_file_info* fi)
 {
-    DIR* dp;
-
     (void) fi;
 
     auto conn = restfs_pool->aquire();
