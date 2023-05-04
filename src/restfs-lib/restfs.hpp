@@ -46,7 +46,49 @@ namespace restfs
         P_FILE,
     };
 
+    /** Represents some object in the hosts FS. */
+    struct RESTfulFSObject
+    {
+        RESTfulFileType   info_ft;
+        std::string       info_path;
+        uint              info_s_atime; // (a,m & c) time in seconds
+        uint              info_s_mtime;
+        uint              info_s_ctime;
+        unsigned long int info_ino;
+        uint              info_uid;
+        int               info_dtype;
+        std::string       info_dname;
+
+        size_t      content_length;
+        std::string content;
+
+        std::vector<RESTfulFSObject> nodes;
+
+        template<class Archive>
+        void serialize(Archive& archive)
+        {
+            archive(
+                info_ft,
+                info_path,
+                info_s_atime,
+                info_s_mtime,
+                info_s_ctime,
+                info_ino,
+                info_uid,
+                info_dtype,
+                info_dname,
+                content_length,
+                content,
+                nodes);
+        }
+    };
+
+    /** 
+     * Correlates the protocol enumeration to the
+     * string equivalent.
+    */
     std::string protocol2string(RESTfulProtocol);
+    int restfs_main(int argc, const char* const* argv);
 
     /**
      * Pool of `RESTfulConnection` objects.
@@ -170,41 +212,4 @@ namespace restfs
         .read    = restRead,
         .readdir = restReaddir,
     };
-
-    struct RESTfulFSObject
-    {
-        RESTfulFileType   info_ft;
-        std::string       info_path;
-        uint              info_s_atime; // (a,m & c) time in seconds
-        uint              info_s_mtime;
-        uint              info_s_ctime;
-        unsigned long int info_ino;
-        uint              info_uid;
-        int               info_dtype;
-        std::string       info_dname;
-
-        size_t      content_length;
-        std::string content;
-
-        std::vector<RESTfulFSObject> nodes;
-
-        template<class Archive>
-        void serialize(Archive& archive)
-        {
-            archive(
-                info_ft,
-                info_path,
-                info_s_atime,
-                info_s_mtime,
-                info_s_ctime,
-                info_ino,
-                info_uid,
-                info_dtype,
-                info_dname,
-                content_length,
-                content,
-                nodes);
-        }
-    };
-
 } // namespace restfs

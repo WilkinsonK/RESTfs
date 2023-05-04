@@ -14,3 +14,8 @@ std::string restfs::protocol2string(RESTfulProtocol protocol)
             return "http";
     }
 }
+
+int restfs::restfs_main(int argc, const char* const* argv)
+{
+    return fuse_main(argc, (char**)argv, &restfs_operations, NULL);
+}

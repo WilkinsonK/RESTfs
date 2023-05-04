@@ -37,6 +37,7 @@ void restfs::RESTfulPool::createConnection(
     const std::string& password)
 {
     sharedConnection conn(new RestClient::Connection(this->getFullURL()));
+    conn->SetBasicAuth(username, password);
     conn->SetUserAgent(this->request_conf.USER_AGENT);
     conn->SetTimeout(this->request_conf.REQUEST_TTL);
     conn->FollowRedirects(this->request_conf.FOLLOW_REDIRECTS);
