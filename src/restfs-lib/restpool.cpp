@@ -7,7 +7,7 @@ std::string restfs::RESTfulPool::getFullURL()
     buffer << this->protocol << "://" << this->hostname;
     if (this->port > 0)
         buffer << ":" << this->port;
-    buffer << "/";
+    buffer << "/" RESTFS_NAME "/";
     return buffer.str();
 }
 
