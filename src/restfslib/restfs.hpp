@@ -1,8 +1,7 @@
 #pragma once
 
-#define FUSE_USE_VERSION 35
-
 #include <condition_variable>
+#include <iostream>
 #include <mutex>
 #include <sstream>
 #include <vector>
@@ -11,7 +10,6 @@
 #include <cereal/cereal.hpp>
 #include <cereal/types/vector.hpp>
 #include <cereal/archives/json.hpp>
-#include <fuse.h>
 #include <restclient-cpp/connection.h>
 #include <restclient-cpp/restclient.h>
 
@@ -88,7 +86,6 @@ namespace restfs
      * string equivalent.
     */
     std::string protocol2string(RESTfulProtocol);
-    int restfs_main(int argc, const char* const* argv);
 
     /**
      * Pool of `RESTfulConnection` objects.
@@ -164,52 +161,5 @@ namespace restfs
             size_t actual_count;
             size_t unused_count;
             sharedConnection unused_stack[request_conf.POOL_SIZE];
-    };
-
-    int doRESTfulGetattr(const char*, struct stat*);
-    int doRESTfulRead(
-        const char*,
-        char*,
-        size_t,
-        off_t,
-        struct fuse_file_info*);
-    int doRESTfulReaddir(
-            const char*,
-            void*,
-            fuse_fill_dir_t,
-            off_t,
-            struct fuse_file_info*);
-
-    static int restGetattr(const char* path, struct stat* stbuffer)
-    {
-        return doRESTfulGetattr(path, stbuffer);
-    }
-
-    static int restRead(
-        const char* path,
-        char* buffer,
-        size_t size,
-        off_t offset,
-        struct fuse_file_info* fi)
-    {
-        return doRESTfulRead(path, buffer, size, offset, fi);
-    }
-
-    static int restReaddir(
-        const char* path,
-        void* buffer,
-        fuse_fill_dir_t filler,
-        off_t offset,
-        struct fuse_file_info* fi)
-    {
-        return doRESTfulReaddir(path, buffer, filler, offset, fi);
-    }
-
-    static std::shared_ptr<RESTfulPool> restfs_pool;
-    static const struct fuse_operations restfs_operations =
-    {
-        .getattr = restGetattr,
-        .read    = restRead,
-        .readdir = restReaddir,
     };
 } // namespace restfs
